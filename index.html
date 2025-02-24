@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OK Connect AI</title>
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    
+    <!-- Custom CSS -->
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+        .card {
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 0 15px rgba(0,0,0,0.1);
+        }
+        .btn-primary {
+            background-color: #0d6efd;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+        }
+        .btn-primary:hover {
+            background-color: #0b5ed7;
+        }
+        .form-control {
+            border-radius: 8px;
+            padding: 10px 15px;
+        }
+    </style>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OK Connect AI</title>
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    
+    <!-- Fullbar CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/jquery-fullbar/dist/jquery.fullbar.min.css" rel="stylesheet">
+    
+    <!-- Custom CSS -->
+    <link href="css/styles.css" rel="stylesheet">
+    <link href="css/dashboard.css" rel="stylesheet">
+</head>
+<body>
+    <!-- Loading Overlay -->
+    <div id="loading-overlay" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.8); z-index: 9999;">
+        <div class="d-flex justify-content-center align-items-center h-100">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Carregando...</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container">
+            <a class="navbar-brand" href="#">
+                <i class="fas fa-robot me-2"></i>
+                OK Connect AI
+            </a>
+        </div>
+    </nav>
+
+
+    <!-- Main Content -->
+    <div class="container py-5">
+        <div class="row justify-content-center">
+            <div class="col-md-6 col-lg-4">
+                <div class="card">
+                    <div class="card-body p-4">
+                        <h4 class="text-center mb-4">
+                            <i class="fas fa-envelope me-2"></i>
+                            Verificação de Email
+                        </h4>
+                        <form id="emailForm">
+                            <div class="mb-3">
+                                <label for="email" class="form-label">Email</label>
+                                <input type="email" class="form-control" id="email" required
+                                       placeholder="Seu email">
+                            </div>
+                            <button type="submit" class="btn btn-primary w-100">
+                                <i class="fas fa-check-circle me-2"></i>
+                                Verificar Email
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Result Card (initially hidden) -->
+                <div id="resultCard" class="card mt-4" style="display: none;">
+                    <div class="card-body p-4">
+                        <h5 class="card-title" id="resultTitle"></h5>
+                        <p class="card-text" id="resultMessage"></p>
+                        <button class="btn btn-outline-primary w-100" onclick="resetForm()">
+                            <i class="fas fa-redo me-2"></i>
+                            Verificar Outro Email
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Scripts -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        // Show/hide loading overlay
+        function toggleLoading(show) {
+            $('#loading-overlay').toggle(show);
+        }
+
+        // Reset form and hide result
+        function resetForm() {
+            $('#emailForm')[0].reset();
+            $('#resultCard').hide();
+            $('#emailForm').show();
+        }
+
+        // Show result with appropriate styling
+        function showResult(success, message) {
+            $('#emailForm').hide();
+            $('#resultCard').show();
+            
+            if (success) {
+                $('#resultTitle').html('<i class="fas fa-check-circle text-success me-2"></i>Sucesso!');
+                $('#resultTitle').removeClass('text-danger').addClass('text-success');
+            } else {
+                $('#resultTitle').html('<i class="fas fa-times-circle text-danger me-2"></i>Erro!');
+                $('#resultTitle').removeClass('text-success').addClass('text-danger');
+            }
+            
+            $('#resultMessage').text(message);
+        }
+
+        // Handle form submission
+        $('#emailForm').on('submit', function(e) {
+            e.preventDefault();
+            const email = $('#email').val();
+            
+            toggleLoading(true);
+            
+            fetch('https://app.okinteligenciaartificial.com.br/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ email: email })
+            })
+            .then(response => response.json())
+            .then(data => {
+                toggleLoading(false);
+                if (data.success === 1) {
+                    showResult(true, 'Email verificado com sucesso!');
+                } else {
+                    showResult(false, data.error || 'Erro ao verificar email');
+                }
+            })
+            .catch(error => {
+                toggleLoading(false);
+                showResult(false, 'Erro ao conectar com o servidor');
+                console.error('Error:', error);
+            });
+        });
+    </script>
+    
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Fullbar -->
+    <script src="https://cdn.jsdelivr.net/npm/jquery-fullbar/dist/jquery.fullbar.min.js"></script>
+    
+    <!-- Custom JS -->
+    <script src="js/config.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/pages/login.js"></script>
+    <script src="js/pages/dashboard.js"></script>
+    <script src="js/router.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
