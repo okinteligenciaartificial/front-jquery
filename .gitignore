@@ -23,3 +23,10 @@ npm-debug.log*
 # Build
 dist/
 build/
+
+# Docker
+Dockerfile
+docker-compose.yml
+
+# Temporary files
+root@*
